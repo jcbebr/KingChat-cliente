@@ -18,6 +18,10 @@ public enum CommandStatementValue {
     REMOVECONTACT_STATUS,
     CONTACTLIST,
     CONTACTLIST_STATUS,
-    IDENTIFY;
+    IDENTIFY,
+    MESSAGE,
+    MESSAGE_STATUS,
+    FILE,
+    FILE_STATUS;
 
 }

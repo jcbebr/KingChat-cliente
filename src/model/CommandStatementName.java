@@ -18,7 +18,9 @@ public enum CommandStatementName {
     CMM_BIRTH("birth"),
     CMM_ONLINE("online"),
     CMM_PATH("path"),
-    CMM_PORT("port");
+    CMM_PORT("port"),
+    CMM_MESSAGE("message"),
+    CMM_FILE("file");
 
     private String name;
 

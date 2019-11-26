@@ -17,16 +17,26 @@ import org.json.JSONObject;
  *
  * @author José Carlos
  */
-public abstract class CommCommand {
+public abstract class CommCommand extends Thread {
 
     protected Socket socket;
     private BufferedReader in;
     private PrintWriter out;
     protected boolean status;
 
-    public CommCommand() {
+    public CommCommand(Socket socket) {
         try {
-            this.socket = new Socket("192.168.1.8", 56000);
+            this.socket = socket;
+            this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            this.out = new PrintWriter(this.socket.getOutputStream(), true);
+        } catch (IOException ex) {
+            Logger.getLogger(CommCommand.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public CommCommand(String path, int port) {
+        try {
+            this.socket = new Socket(path, port);
             this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             this.out = new PrintWriter(this.socket.getOutputStream(), true);
         } catch (IOException ex) {
@@ -34,7 +44,8 @@ public abstract class CommCommand {
         }
     }
 
-    public abstract void execute();
+    @Override
+    public abstract void run();
 
     public boolean getStatus() {
         return status;
@@ -43,7 +54,7 @@ public abstract class CommCommand {
     protected void send(String command) {
         out.println(command);
     }
-
+    
     protected String read() {
         try {
             return in.readLine();
@@ -111,11 +122,11 @@ public abstract class CommCommand {
         }
         return client;
     }
-    
+
     public static Client getRandomClient() {
         int nc = new Random().nextInt(9999);
         return new Client("Cliente teste_" + nc, "email@" + nc,
                 "old_email@" + nc, "pass_" + nc, nc * 2, true, nc + "." + nc, nc);
     }
-    
+
 }

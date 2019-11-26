@@ -1,19 +1,17 @@
 package view;
 
-import control.ClientController;
-import control.command.LoginCommCommand;
-import control.command.SignInCommCommand;
+import control.observer.ClientController;
+import control.observer.InitFrameObserver;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import model.Client;
 
 /**
  *
  * @author José Carlos
  */
-public class InitFrame extends JFrame {
+public class InitFrame extends JFrame implements InitFrameObserver {
 
     public static void main(String args[]) {
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -55,6 +53,7 @@ public class InitFrame extends JFrame {
                 System.exit(0);
             }
         });
+        ClientController.getInstance().addObservador(this);
     }
 
     @SuppressWarnings("unchecked")
@@ -114,47 +113,33 @@ public class InitFrame extends JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        Client client = new Client();
-        client.setNick(loginPanel.getNick());
-        client.setPass(loginPanel.getPass());
-        LoginCommCommand loginCommCommand = new LoginCommCommand(client);
-        loginCommCommand.execute();
-        if (loginCommCommand.getStatus()) {
-            sendSuccessMessage("Sucesso ao logar");
-            this.dispose();
-            new MainFrame().setVisible(true);
-            ClientController.getInstance().setOnline(true);
-        } else {
-            sendErrorMessage("Não foi fazer o login, confira seus dados!");
-        }
+        ClientController.getInstance().doLogin(loginPanel.getNick(), loginPanel.getPass());
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignInActionPerformed
-        try {
-            Client client = new Client();
-            client.setNick(signInPanel.getNick());
-            client.setEmail(signInPanel.getEmail());
-            client.setPass(signInPanel.getPass());
-            client.setBirth(Integer.parseInt(signInPanel.getBirth()));
-            SignInCommCommand signInCommCommand = new SignInCommCommand(client);
-            signInCommCommand.execute();
-            if (signInCommCommand.getStatus()) {
-                sendSuccessMessage("Sucesso ao cadastrar, faça o Login");
-                signInPanel.cleanFields();
-            } else {
-                sendErrorMessage("Não foi possível cadastrar este Usuário!");
-            }
-        } catch (NumberFormatException ex) {
-            sendErrorMessage("Valor inválido no cammpo 'ano de nascimento'");
-        }
+        ClientController.getInstance().doSingin(signInPanel.getNick(),
+                signInPanel.getEmail(), signInPanel.getPass(), signInPanel.getBirth());
     }//GEN-LAST:event_btnSignInActionPerformed
 
-    public static void sendErrorMessage(String message) {
+    @Override
+    public void notifyOperationFailed(String message) {
         JOptionPane.showMessageDialog(null, message, "Erro", JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void sendSuccessMessage(String message) {
+    @Override
+    public void notifyOperationSuccess(String message) {
         JOptionPane.showMessageDialog(null, message, "Finalizado", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    @Override
+    public void notifyNextFrame() {
+        this.dispose();
+        new MainFrame().setVisible(true);
+    }
+
+    @Override
+    public void notifyCleanFields() {
+        signInPanel.cleanFields();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
