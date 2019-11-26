@@ -24,7 +24,7 @@ import org.junit.Test;
 public class SignInCommCommandTest extends TestCase {
 
     private boolean bodyTest(Client client) {
-        try (Socket socket = new Socket(Defs.getInstance().getPath(), Defs.getInstance().getPort());
+        try (Socket socket = new Socket(Defs.getInstance().getServer_path(), Defs.getInstance().getServer_port());
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);) {
 
