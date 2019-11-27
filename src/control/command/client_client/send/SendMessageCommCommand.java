@@ -37,27 +37,10 @@ public class SendMessageCommCommand extends CommCommand {
             json.put(CommandStatementName.CMM_MESSAGE.getName(), this.message);
             send(json.toString());
 
-            persistMessage(client.getId(), message);
+            ClientController.getInstance().persistSendChat(client.getId(), message);
         } finally {
             close();
-            ClientController.getInstance().persistChat(this.client.getId());
-        }
-    }
-
-    public static void persistMessage(int clientId, String message) {
-        FileWriter fr = null;
-        try {
-            File file = new File(ClientController.getInstance().getClient().getId() + "_" + clientId + ".txt");
-            fr = new FileWriter(file, true);
-            fr.write(ClientController.getInstance().getClient().getNick() + ": " + message + "\n");
-        } catch (IOException ex) {
-            Logger.getLogger(SendFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                fr.close();
-            } catch (IOException ex) {
-                Logger.getLogger(SendFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            ClientController.getInstance().processChat(this.client.getId());
         }
     }
 

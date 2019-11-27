@@ -42,7 +42,7 @@ public class SendFileCommCommand extends CommCommand {
             json.put(CommandStatementName.CMM_FILE.getName(), file.getName());
             send(json.toString());
 
-            SendMessageCommCommand.persistMessage(client.getId(), "Enviando arquivo.");
+            ClientController.getInstance().persistSendChat(client.getId(), "Enviando arquivo.");
             
             byte[] bytes = new byte[16 * 1024];
             fIn = new FileInputStream(file);
@@ -53,10 +53,10 @@ public class SendFileCommCommand extends CommCommand {
                 fOut.write(bytes, 0, count);
             }
 
-            SendMessageCommCommand.persistMessage(client.getId(), "Arquivo enviado com sucesso.");
+            ClientController.getInstance().persistSendChat(client.getId(), "Arquivo enviado com sucesso.");
 
         } catch (IOException ex) {
-            SendMessageCommCommand.persistMessage(client.getId(), "Falha ao enviar arquivo.");
+            ClientController.getInstance().persistSendChat(client.getId(), "Falha ao enviar arquivo.");
             Logger.getLogger(SendFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
@@ -66,7 +66,7 @@ public class SendFileCommCommand extends CommCommand {
             } catch (IOException ex) {
                 Logger.getLogger(SendFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
             }
-            ClientController.getInstance().persistChat(this.client.getId());
+            ClientController.getInstance().processChat(this.client.getId());
         }
     }
 

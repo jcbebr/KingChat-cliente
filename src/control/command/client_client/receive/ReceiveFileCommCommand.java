@@ -4,7 +4,6 @@ import control.command.CommCommand;
 import control.command.client_client.send.SendMessageCommCommand;
 import control.observer.ClientController;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +39,7 @@ public class ReceiveFileCommCommand extends CommCommand {
             this.nick = json.getString(CommandStatementName.CMM_NICK.getName());
             this.file_name = json.getString(CommandStatementName.CMM_FILE.getName());
 
-            SendMessageCommCommand.persistMessage(this.id, "Recebendo arquivo");
+            ClientController.getInstance().persistReceiveChat(this.id, this.nick, "Recebendo arquivo");
             
             File file = new File(this.file_name);
             fIn = socket.getInputStream();
@@ -57,10 +56,10 @@ public class ReceiveFileCommCommand extends CommCommand {
                 fOut.write(bytes, 0, count);
             }
 
-            SendMessageCommCommand.persistMessage(this.id, "Aqruivo: '" + file_name + "' recebido.");
+            ClientController.getInstance().persistReceiveChat(this.id, this.nick, "Aqruivo: '" + this.file_name + "' recebido.");
 
         } catch (IOException ex) {
-            SendMessageCommCommand.persistMessage(this.id, "Falha ao receber arquivo.");
+            ClientController.getInstance().persistReceiveChat(this.id, this.nick, "Falha ao receber arquivo.");
             Logger.getLogger(ReceiveFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
@@ -70,7 +69,7 @@ public class ReceiveFileCommCommand extends CommCommand {
             } catch (IOException ex) {
                 Logger.getLogger(ReceiveFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
             }
-            ClientController.getInstance().persistChat(this.id);
+            ClientController.getInstance().processChat(this.id);
         }
     }
 

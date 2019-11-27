@@ -12,6 +12,7 @@ import control.command.client_server.LoginCommCommand;
 import control.command.client_server.RemoveContactCommCommand;
 import control.command.client_server.SignInCommCommand;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -145,6 +146,7 @@ public class ClientController implements Observed {
         if (status) {
             notifyCOperationSuccess("Sucesso ao alterar dados");
             notifyMChangedTitle(this.client.getNick());
+            cObss.clear();
         } else {
             notifyCOperationFailed("Não foi possível alterar os dados!");
         }
@@ -210,11 +212,11 @@ public class ClientController implements Observed {
 
     public void persistChat(Client obj_client) {
         if (obj_client.getClass().equals(Client.class)) {
-            persistChat(((Client) obj_client).getId());
+            processChat(((Client) obj_client).getId());
         }
     }
 
-    public byte[] persistChat(int clientId) {
+    public byte[] processChat(int clientId) {
         try {
             String fileName = ClientController.getInstance().getClient().getId() + "_" + clientId + ".txt";
             if (new File(fileName).exists()) {
@@ -231,6 +233,40 @@ public class ClientController implements Observed {
         return null;
     }
 
+    public void persistSendChat(int clientId, String message) {
+        FileWriter fr = null;
+        try {
+            File file = new File(ClientController.getInstance().getClient().getId() + "_" + clientId + ".txt");
+            fr = new FileWriter(file, true);
+            fr.write(ClientController.getInstance().getClient().getNick() + ": " + message + "\n");
+        } catch (IOException ex) {
+            Logger.getLogger(SendFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fr.close();
+            } catch (IOException ex) {
+                Logger.getLogger(SendFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public void persistReceiveChat(int clientId, String clientNick, String message) {
+        FileWriter fr = null;
+        try {
+            File file = new File(ClientController.getInstance().getClient().getId() + "_" + clientId + ".txt");
+            fr = new FileWriter(file, true);
+            fr.write(clientNick + ": " + message + "\n");
+        } catch (IOException ex) {
+            Logger.getLogger(SendFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fr.close();
+            } catch (IOException ex) {
+                Logger.getLogger(SendFileCommCommand.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
     private static Client lastSelected;
 
     public void refreshChat(Object obj_client) {
@@ -238,7 +274,7 @@ public class ClientController implements Observed {
             Client c = (Client) obj_client;
             if (c.isOnline()) {
                 this.lastSelected = c;
-                notifyMRefreshChat(persistChat(c.getId()), c.getNick() + ", " + (2019 - c.getBirth()));
+                notifyMRefreshChat(processChat(c.getId()), c.getNick() + ", " + (2019 - c.getBirth()));
             } else {
                 notifyMOperationFailed("Você não pode iniciar um chat com um contato offline.");
             }
@@ -308,11 +344,11 @@ public class ClientController implements Observed {
 
     @Override
     public void removerObservador(Observer obs) {
-        if (obs.getClass().equals(MainFrameObserver.class)) {
+        if (obs.getClass().equals(MainFrame.class)) {
             this.mObss.remove((MainFrameObserver) obs);
-        } else if (obs.getClass().equals(InitFrameObserver.class)) {
+        } else if (obs.getClass().equals(InitFrame.class)) {
             this.iObss.remove((InitFrameObserver) obs);
-        } else if (obs.getClass().equals(ChangeDataObserver.class)) {
+        } else if (obs.getClass().equals(ChangeDataFrame.class)) {
             this.cObss.remove((ChangeDataObserver) obs);
         }
     }

@@ -14,8 +14,9 @@ import org.json.JSONObject;
 public class ReceiveMessageCommCommand extends CommCommand {
 
     private JSONObject json;
-    private String message;
     private int id;
+    private String nick;
+    private String message;
 
     public ReceiveMessageCommCommand(Socket socket, JSONObject json) {
         super(socket);
@@ -26,12 +27,13 @@ public class ReceiveMessageCommCommand extends CommCommand {
     public void run() {
         try {
             this.id = json.getInt(CommandStatementName.CMM_ID.getName());
+            this.nick = json.getString(CommandStatementName.CMM_NICK.getName());
             this.message = json.getString(CommandStatementName.CMM_MESSAGE.getName());
 
-            SendMessageCommCommand.persistMessage(this.id, message);
+            ClientController.getInstance().persistReceiveChat(this.id, this.nick, this.message);
         } finally {
             close();
-            ClientController.getInstance().persistChat(this.id);
+            ClientController.getInstance().processChat(this.id);
         }
     }
 

@@ -369,7 +369,8 @@ public class MainFrame extends JFrame implements MainFrameObserver {
 
     private void btnChangeDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangeDataActionPerformed
         this.setVisible(false);
-        new ChangeDataFrame(this).setVisible(true);
+        ChangeDataFrame changeData = new ChangeDataFrame(this);
+        changeData.setVisible(true);
     }//GEN-LAST:event_btnChangeDataActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed

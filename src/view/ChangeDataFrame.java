@@ -24,11 +24,12 @@ public class ChangeDataFrame extends JFrame implements ChangeDataObserver {
         tfPath.setText(ClientController.getInstance().getClient().getPath());
         tfPort.setText("" + ClientController.getInstance().getClient().getPort());
         this.father = father;
-        this.setLocationRelativeTo(null);
+        this.setLocationRelativeTo(father);
         this.setTitle("Alterar dados");
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 father.setVisible(true);
+                dispose();
             }
         });
         ClientController.getInstance().addObservador(this);
